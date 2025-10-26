@@ -39,7 +39,7 @@ const footerLinks = {
 };
 
 const socialLinks = [
-  { name: "GitHub", icon: Github, href: "https://github.com/parthikjadav" },
+  { name: "GitHub", icon: Github, href: "https://github.com/parthikjadav/converto-tomato" },
   { name: "Email", icon: Mail, href: "mailto:jadavparthik56@gmail.com" },
 ];
 
