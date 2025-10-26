@@ -1,7 +1,36 @@
 import Link from 'next/link';
+import { Metadata } from 'next';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowRight, Zap, Shield, Sparkles } from 'lucide-react';
+
+export const metadata: Metadata = {
+  title: "Free Online Image Converter & Compressor - 20+ Formats",
+  description: "Convert images between JPG, PNG, WebP, SVG, AVIF, and ICO formats. Free online tool with 20 converters. Fast, secure, 100% browser-based. No uploads required.",
+  keywords: [
+    "free image converter",
+    "online image converter",
+    "jpg to png converter",
+    "png to jpg converter",
+    "webp converter",
+    "svg to png",
+    "avif converter",
+    "image compressor",
+    "favicon generator",
+    "ico maker",
+    "convert images online free",
+    "browser-based image converter"
+  ],
+  openGraph: {
+    title: "Free Online Image Converter & Compressor - 20+ Formats",
+    description: "Convert images between JPG, PNG, WebP, SVG, AVIF, and ICO formats. Fast, secure, 100% browser-based.",
+    url: "https://converto-tomato.vercel.app",
+    type: "website",
+  },
+  alternates: {
+    canonical: "https://converto-tomato.vercel.app",
+  },
+};
 
 export default function Home() {
   return (

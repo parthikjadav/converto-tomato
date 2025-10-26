@@ -4,9 +4,31 @@ import ImageCompressor from '@/components/compressor/ImageCompressor';
 import ConverterSkeleton from '@/components/converter/ConverterSkeleton';
 
 export const metadata: Metadata = {
-  title: 'Image Compressor - Reduce File Size | Converto Tomato',
-  description: 'Compress JPG, PNG, and WebP images. Reduce file size while maintaining quality. Resize images and adjust compression. 100% free and secure.',
-  keywords: ['image compressor', 'compress images', 'reduce file size', 'image optimizer', 'jpg compressor', 'png compressor'],
+  title: 'Free Image Compressor - Reduce File Size Online | Converto Tomato',
+  description: 'Compress JPG, PNG, and WebP images online. Reduce file size up to 90% while maintaining quality. Resize images and adjust compression. 100% free, secure, and browser-based. No uploads required.',
+  keywords: [
+    'image compressor',
+    'compress images online',
+    'reduce image file size',
+    'image optimizer',
+    'jpg compressor',
+    'png compressor',
+    'webp compressor',
+    'resize images',
+    'optimize images',
+    'free image compression',
+    'online image optimizer',
+    'lossless compression'
+  ],
+  openGraph: {
+    title: 'Free Image Compressor - Reduce File Size Online',
+    description: 'Compress JPG, PNG, and WebP images. Reduce file size up to 90% while maintaining quality.',
+    url: 'https://converto-tomato.vercel.app/compress',
+    type: 'website',
+  },
+  alternates: {
+    canonical: 'https://converto-tomato.vercel.app/compress',
+  },
 };
 
 export default function CompressPage() {

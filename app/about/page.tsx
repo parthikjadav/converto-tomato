@@ -5,9 +5,27 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Shield, Zap, Lock, Globe, Heart, Code } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'About Us - Converto Tomato | Free Image Converter',
-  description: 'Learn about Converto Tomato - a free, secure, and fast image conversion tool. Convert JPG, PNG, and WebP images directly in your browser with complete privacy.',
-  keywords: ['about converto tomato', 'image converter', 'free tool', 'privacy', 'browser-based'],
+  title: 'About Us - Free Online Image Converter | Converto Tomato',
+  description: 'Learn about Converto Tomato - a free, secure, and fast image conversion tool supporting 20+ formats. Convert JPG, PNG, WebP, SVG, AVIF, and ICO directly in your browser with complete privacy. No uploads, 100% secure.',
+  keywords: [
+    'about converto tomato',
+    'free image converter',
+    'browser-based converter',
+    'privacy-focused converter',
+    'secure image conversion',
+    'no upload converter',
+    'offline image converter',
+    'open source converter'
+  ],
+  openGraph: {
+    title: 'About Us - Free Online Image Converter | Converto Tomato',
+    description: 'Learn about Converto Tomato - a free, secure, and fast image conversion tool supporting 20+ formats.',
+    url: 'https://converto-tomato.vercel.app/about',
+    type: 'website',
+  },
+  alternates: {
+    canonical: 'https://converto-tomato.vercel.app/about',
+  },
 };
 
 const features = [
