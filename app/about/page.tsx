@@ -111,7 +111,7 @@ export default function AboutPage() {
                   privacy and security.
                 </p>
                 <p>
-                  We're committed to keeping Converto Tomato free forever, with no hidden fees, 
+                  We&apos;re committed to keeping Converto Tomato free forever, with no hidden fees, 
                   no watermarks, and no limitations. Our goal is to provide the best image conversion 
                   experience possible while respecting your privacy and time.
                 </p>
@@ -253,7 +253,7 @@ export default function AboutPage() {
                 <div>
                   <h2 className="text-3xl font-bold text-gray-900 mb-2">Your Privacy Matters</h2>
                   <p className="text-gray-600 text-lg">
-                    We take your privacy seriously. Here's our commitment:
+                    We take your privacy seriously. Here&apos;s our commitment:
                   </p>
                 </div>
               </div>
@@ -264,7 +264,7 @@ export default function AboutPage() {
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-primary mt-1">✓</span>
-                  <span>No data collection - we don't track or store your images</span>
+                  <span>No data collection - we don&apos;t track or store your images</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-primary mt-1">✓</span>

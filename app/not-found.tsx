@@ -24,7 +24,7 @@ export default function NotFound() {
               Page Not Found
             </h1>
             <p className="text-xl text-gray-600">
-              Oops! The page you're looking for doesn't exist.
+              Oops! The page you&apos;re looking for doesn&apos;t exist.
             </p>
             <p className="text-gray-500">
               It might have been moved or deleted, or you may have mistyped the URL.

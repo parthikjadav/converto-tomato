@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import { useEffect } from 'react';
-import Link from 'next/link';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { AlertTriangle, Home, RefreshCw } from 'lucide-react';
+import { useEffect } from "react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { AlertTriangle, Home, RefreshCw } from "lucide-react";
 
 export default function Error({
   error,
@@ -15,7 +15,7 @@ export default function Error({
 }) {
   useEffect(() => {
     // Log the error to an error reporting service
-    console.error('Application error:', error);
+    console.error("Application error:", error);
   }, [error]);
 
   return (
@@ -41,12 +41,13 @@ export default function Error({
               We encountered an unexpected error.
             </p>
             <p className="text-gray-500">
-              Don't worry, your files are safe. All processing happens in your browser.
+              Don&apos;t worry, your files are safe. All processing happens in
+              your browser.
             </p>
           </div>
 
           {/* Error Details (Development) */}
-          {process.env.NODE_ENV === 'development' && error.message && (
+          {process.env.NODE_ENV === "development" && error.message && (
             <div className="bg-gray-100 border border-gray-300 rounded-lg p-4 text-left">
               <p className="text-sm font-mono text-gray-700 break-all">
                 {error.message}
@@ -76,8 +77,9 @@ export default function Error({
           {/* Help Text */}
           <div className="pt-8 border-t">
             <p className="text-sm text-gray-600">
-              If this problem persists, try refreshing the page or clearing your browser cache.
-              All conversions happen locally in your browser, so your files remain private.
+              If this problem persists, try refreshing the page or clearing your
+              browser cache. All conversions happen locally in your browser, so
+              your files remain private.
             </p>
           </div>
         </CardContent>

@@ -38,7 +38,7 @@ export async function compressImage(
         return;
       }
 
-      img.onload = () => {
+      img.onload = async () => {
         try {
           // Calculate dimensions
           let width = img.width;
@@ -78,33 +78,41 @@ export async function compressImage(
           ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
           // Determine output format
-          const outputFormat = getOutputFormat(file.type);
+          const preferredFormats = getPreferredOutputFormats(file.type);
+          let blob: Blob | null = null;
+          let formatUsed = preferredFormats[0];
 
-          // Convert to blob
-          canvas.toBlob(
-            (blob) => {
-              if (!blob) {
-                reject(new Error('Failed to compress image'));
-                return;
-              }
+          for (const format of preferredFormats) {
+            blob = await canvasToBlob(
+              canvas,
+              format,
+              format === 'image/png' ? undefined : options.quality
+            );
 
-              const url = URL.createObjectURL(blob);
-              const compressionRatio = ((file.size - blob.size) / file.size) * 100;
+            if (blob) {
+              formatUsed = format;
+              break;
+            }
+          }
 
-              resolve({
-                blob,
-                url,
-                size: blob.size,
-                originalSize: file.size,
-                width: canvas.width,
-                height: canvas.height,
-                format: outputFormat,
-                compressionRatio: Math.max(0, compressionRatio),
-              });
-            },
-            outputFormat,
-            options.quality
-          );
+          if (!blob) {
+            reject(new Error('Failed to compress image'));
+            return;
+          }
+
+          const url = URL.createObjectURL(blob);
+          const compressionRatio = ((file.size - blob.size) / file.size) * 100;
+
+          resolve({
+            blob,
+            url,
+            size: blob.size,
+            originalSize: file.size,
+            width: canvas.width,
+            height: canvas.height,
+            format: formatUsed,
+            compressionRatio: Math.max(0, compressionRatio),
+          });
         } catch (error) {
           reject(error);
         }
@@ -126,14 +134,35 @@ export async function compressImage(
 }
 
 /**
- * Get output format based on input type
+ * Convert canvas to blob with Promise interface
  */
-function getOutputFormat(inputType: string): string {
+function canvasToBlob(
+  canvas: HTMLCanvasElement,
+  type: string,
+  quality?: number
+): Promise<Blob | null> {
+  return new Promise((resolve) => {
+    canvas.toBlob((blob) => resolve(blob), type, quality);
+  });
+}
+
+/**
+ * Get preferred output formats based on input type
+ */
+function getPreferredOutputFormats(inputType: string): string[] {
   const type = inputType.toLowerCase();
-  
-  if (type.includes('png')) return 'image/png';
-  if (type.includes('webp')) return 'image/webp';
-  return 'image/jpeg'; // Default to JPEG
+
+  if (type.includes('png')) {
+    // Prefer WebP for better compression while preserving transparency
+    return ['image/webp', 'image/png'];
+  }
+
+  if (type.includes('webp')) {
+    return ['image/webp'];
+  }
+
+  // Default to JPEG with WebP fallback for other formats
+  return ['image/jpeg', 'image/webp'];
 }
 
 /**
