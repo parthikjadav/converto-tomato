@@ -1,10 +1,10 @@
 'use client';
 
 import { useState, useCallback } from 'react';
-import { convertJPGtoWebP, formatFileSize, downloadBlob, calculateCompression, ConversionResult } from '@/lib/converter/jpgToWebpConverter';
-import { validateFiles, FileValidationError, MAX_FILES } from '@/lib/converter/jpgToWebpValidator';
+import { convertJPGtoAVIF, formatFileSize, downloadBlob, calculateCompression, ConversionResult } from '@/lib/converter/jpg/jpgToAvifConverter';
+import { validateFiles, FileValidationError, MAX_FILES } from '@/lib/converter/jpg/jpgToAvifValidator';
 import { Card, CardContent } from '@/components/ui/card';
-import { UploadArea, FileCard, SummaryCard, QualitySettings, ErrorMessage, BatchActions } from './shared';
+import { UploadArea, FileCard, SummaryCard, QualitySettings, ErrorMessage, BatchActions } from '@/components/converter/shared';
 
 interface FileWithResult {
   file: File;
@@ -14,7 +14,7 @@ interface FileWithResult {
   error: string | null;
 }
 
-export default function JpgToWebpConverter() {
+export default function JpgToAvifConverter() {
   const [files, setFiles] = useState<FileWithResult[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -62,7 +62,7 @@ export default function JpgToWebpConverter() {
     if (!fileData || fileData.isConverting) return;
     setFiles((prev) => prev.map((f, i) => (i === index ? { ...f, isConverting: true, error: null } : f)));
     try {
-      const result = await convertJPGtoWebP(fileData.file, quality / 100);
+      const result = await convertJPGtoAVIF(fileData.file, quality / 100);
       setFiles((prev) => prev.map((f, i) => (i === index ? { ...f, convertedResult: result, isConverting: false } : f)));
     } catch (err) {
       setFiles((prev) => prev.map((f, i) => i === index ? { ...f, error: err instanceof Error ? err.message : 'Conversion failed', isConverting: false } : f));
@@ -79,7 +79,7 @@ export default function JpgToWebpConverter() {
     const fileData = files[index];
     if (!fileData.convertedResult) return;
     const originalName = fileData.file.name.replace(/\.(jpg|jpeg)$/i, '');
-    downloadBlob(fileData.convertedResult.blob, `${originalName}.webp`);
+    downloadBlob(fileData.convertedResult.blob, `${originalName}.avif`);
   };
 
   const downloadAllFiles = () => {
@@ -146,7 +146,7 @@ export default function JpgToWebpConverter() {
                 onQualityChange={setQuality}
                 minQuality={60}
                 maxQuality={100}
-                note="WebP offers better compression than JPG"
+                note="AVIF offers superior compression"
               />
             </div>
 

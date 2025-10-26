@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
 import { Metadata } from 'next';
-import PngToWebpConverter from '@/components/converter/PngToWebpConverter';
+import PngToWebpConverter from '@/components/converter/png/PngToWebpConverter';
 import ConverterSkeleton from '@/components/converter/ConverterSkeleton';
 
 // Metadata for SEO (Server-side)

@@ -1,10 +1,10 @@
 'use client';
 
 import { useState, useCallback } from 'react';
-import { convertPNGtoJPG, formatFileSize, downloadBlob, ConversionResult } from '@/lib/converter/pngToJpgConverter';
-import { validateFiles, FileValidationError, MAX_FILES } from '@/lib/converter/pngValidator';
+import { convertWebPtoPNG, formatFileSize, downloadBlob, ConversionResult } from '@/lib/converter/webp/webpToPngConverter';
+import { validateFiles, FileValidationError, MAX_FILES } from '@/lib/converter/webp/webpToPngValidator';
 import { Card, CardContent } from '@/components/ui/card';
-import { UploadArea, FileCard, SummaryCard, QualitySettings, ErrorMessage, BatchActions } from './shared';
+import { UploadArea, FileCard, SummaryCard, ErrorMessage, BatchActions } from '@/components/converter/shared';
 
 interface FileWithResult {
   file: File;
@@ -14,11 +14,10 @@ interface FileWithResult {
   error: string | null;
 }
 
-export default function PngToJpgConverter() {
+export default function WebpToPngConverter() {
   const [files, setFiles] = useState<FileWithResult[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
-  const [quality, setQuality] = useState(92);
 
   const handleFilesSelect = useCallback((selectedFiles: File[]) => {
     try {
@@ -62,7 +61,7 @@ export default function PngToJpgConverter() {
     if (!fileData || fileData.isConverting) return;
     setFiles((prev) => prev.map((f, i) => (i === index ? { ...f, isConverting: true, error: null } : f)));
     try {
-      const result = await convertPNGtoJPG(fileData.file, quality / 100);
+      const result = await convertWebPtoPNG(fileData.file);
       setFiles((prev) => prev.map((f, i) => (i === index ? { ...f, convertedResult: result, isConverting: false } : f)));
     } catch (err) {
       setFiles((prev) => prev.map((f, i) => i === index ? { ...f, error: err instanceof Error ? err.message : 'Conversion failed', isConverting: false } : f));
@@ -78,8 +77,8 @@ export default function PngToJpgConverter() {
   const downloadSingleFile = (index: number) => {
     const fileData = files[index];
     if (!fileData.convertedResult) return;
-    const originalName = fileData.file.name.replace(/\.png$/i, '');
-    downloadBlob(fileData.convertedResult.blob, `${originalName}.jpg`);
+    const originalName = fileData.file.name.replace(/\.webp$/i, '');
+    downloadBlob(fileData.convertedResult.blob, `${originalName}.png`);
   };
 
   const downloadAllFiles = () => {
@@ -109,6 +108,11 @@ export default function PngToJpgConverter() {
   const convertedCount = files.filter((f) => f.convertedResult).length;
   const hasConvertedFiles = convertedCount > 0;
   const allConverted = files.length > 0 && convertedCount === files.length;
+  const totalOriginalSize = files.reduce((sum, f) => sum + f.file.size, 0);
+  const totalConvertedSize = files.reduce((sum, f) => sum + (f.convertedResult?.size || 0), 0);
+  const sizeIncrease = totalOriginalSize > 0 && totalConvertedSize > totalOriginalSize
+    ? Math.round(((totalConvertedSize - totalOriginalSize) / totalOriginalSize) * 100)
+    : 0;
 
   return (
     <Card className="w-full">
@@ -120,9 +124,9 @@ export default function PngToJpgConverter() {
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
             onFileChange={handleFileChange}
-            acceptedFormats="image/png"
+            acceptedFormats="image/webp"
             maxFiles={MAX_FILES}
-            title="Drag & drop your PNG files here"
+            title="Drag & drop your WebP files here"
           />
         )}
 
@@ -130,38 +134,38 @@ export default function PngToJpgConverter() {
 
         {files.length > 0 && (
           <div className="space-y-6">
-            <div className="grid md:grid-cols-2 gap-4">
-              <SummaryCard
-                filesCount={files.length}
-                maxFiles={MAX_FILES}
-                convertedCount={convertedCount}
-                onClearAll={handleReset}
-              />
-              <QualitySettings
-                quality={quality}
-                onQualityChange={setQuality}
-                minQuality={60}
-                maxQuality={100}
-                note="Higher quality = larger file size"
-              />
-            </div>
+            <SummaryCard
+              filesCount={files.length}
+              maxFiles={MAX_FILES}
+              convertedCount={convertedCount}
+              sizeIncrease={sizeIncrease}
+              showTransparencyNote
+              onClearAll={handleReset}
+            />
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {files.map((fileData, index) => (
-                <FileCard
-                  key={index}
-                  fileName={fileData.file.name}
-                  fileSize={formatFileSize(fileData.file.size)}
-                  previewUrl={fileData.previewUrl}
-                  isConverting={fileData.isConverting}
-                  isConverted={!!fileData.convertedResult}
-                  error={fileData.error}
-                  convertedSize={fileData.convertedResult ? formatFileSize(fileData.convertedResult.size) : undefined}
-                  onRemove={() => removeFile(index)}
-                  onConvert={() => convertSingleFile(index)}
-                  onDownload={() => downloadSingleFile(index)}
-                />
-              ))}
+              {files.map((fileData, index) => {
+                const sizeChange = fileData.convertedResult
+                  ? Math.round(((fileData.convertedResult.size - fileData.file.size) / fileData.file.size) * 100)
+                  : 0;
+                return (
+                  <FileCard
+                    key={index}
+                    fileName={fileData.file.name}
+                    fileSize={formatFileSize(fileData.file.size)}
+                    previewUrl={fileData.previewUrl}
+                    isConverting={fileData.isConverting}
+                    isConverted={!!fileData.convertedResult}
+                    error={fileData.error}
+                    convertedSize={fileData.convertedResult ? formatFileSize(fileData.convertedResult.size) : undefined}
+                    sizeIncrease={sizeChange}
+                    showLosslessBadge
+                    onRemove={() => removeFile(index)}
+                    onConvert={() => convertSingleFile(index)}
+                    onDownload={() => downloadSingleFile(index)}
+                  />
+                );
+              })}
             </div>
 
             <BatchActions

@@ -4,15 +4,38 @@ import Link from "next/link";
 import { Github, Mail } from "lucide-react";
 
 const footerLinks = {
-  converters: [
+  svg: [
+    { name: "SVG to PNG", href: "/convert/svg-to-png" },
+    { name: "SVG to JPG", href: "/convert/svg-to-jpg" },
+    { name: "SVG to WebP", href: "/convert/svg-to-webp" },
+    { name: "SVG to AVIF", href: "/convert/svg-to-avif" },
+    { name: "SVG to ICO", href: "/convert/svg-to-ico" },
+  ],
+  jpg: [
     { name: "JPG to PNG", href: "/convert/jpg-to-png" },
     { name: "JPG to WebP", href: "/convert/jpg-to-webp" },
+    { name: "JPG to AVIF", href: "/convert/jpg-to-avif" },
+    { name: "JPG to SVG", href: "/convert/jpg-to-svg" },
+    { name: "JPG to ICO", href: "/convert/jpg-to-ico" },
+  ],
+  png: [
     { name: "PNG to JPG", href: "/convert/png-to-jpg" },
     { name: "PNG to WebP", href: "/convert/png-to-webp" },
+    { name: "PNG to AVIF", href: "/convert/png-to-avif" },
+    { name: "PNG to SVG", href: "/convert/png-to-svg" },
+    { name: "PNG to ICO", href: "/convert/png-to-ico" },
+  ],
+  webp: [
     { name: "WebP to PNG", href: "/convert/webp-to-png" },
     { name: "WebP to JPG", href: "/convert/webp-to-jpg" },
+    { name: "WebP to AVIF", href: "/convert/webp-to-avif" },
+    { name: "WebP to SVG", href: "/convert/webp-to-svg" },
+    { name: "WebP to ICO", href: "/convert/webp-to-ico" },
   ],
-  company: [{ name: "About", href: "/about" }],
+  company: [
+    { name: "About", href: "/about" },
+    { name: "Compress", href: "/compress" },
+  ],
 };
 
 const socialLinks = [
@@ -23,8 +46,8 @@ const socialLinks = [
 export default async function Footer() {
   return (
     <footer className="border-t bg-background">
-      <div className="container py-12">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+      <div className="container py-12 max-w-6xl">
+        <div className="grid grid-cols-2 md:grid-cols-6 gap-8">
           {/* Brand Column */}
           <div className="col-span-2 md:col-span-1">
             <Link href="/" className="flex items-center space-x-2 mb-4">
@@ -63,11 +86,62 @@ export default async function Footer() {
             </div>
           </div>
 
-          {/* Converters Links */}
+          {/* SVG Converters */}
           <div>
-            <h3 className="font-semibold text-sm mb-4">Converters</h3>
+            <h3 className="font-semibold text-sm mb-4">SVG</h3>
             <ul className="space-y-3">
-              {footerLinks.converters.map((link) => (
+              {footerLinks.svg.map((link) => (
+                <li key={link.name}>
+                  <Link
+                    href={link.href}
+                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    {link.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* JPG Converters */}
+          <div>
+            <h3 className="font-semibold text-sm mb-4">JPG</h3>
+            <ul className="space-y-3">
+              {footerLinks.jpg.map((link) => (
+                <li key={link.name}>
+                  <Link
+                    href={link.href}
+                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    {link.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* PNG Converters */}
+          <div>
+            <h3 className="font-semibold text-sm mb-4">PNG</h3>
+            <ul className="space-y-3">
+              {footerLinks.png.map((link) => (
+                <li key={link.name}>
+                  <Link
+                    href={link.href}
+                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    {link.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* WebP Converters */}
+          <div>
+            <h3 className="font-semibold text-sm mb-4">WebP</h3>
+            <ul className="space-y-3">
+              {footerLinks.webp.map((link) => (
                 <li key={link.name}>
                   <Link
                     href={link.href}

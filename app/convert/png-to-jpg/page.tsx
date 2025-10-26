@@ -1,7 +1,7 @@
 import { Suspense } from 'react';
 import { Metadata } from 'next';
 import ConverterSkeleton from '@/components/converter/ConverterSkeleton';
-import PngToJpgConverter from '@/components/converter/PngToJpgConverter';
+import PngToJpgConverter from '@/components/converter/png/PngToJpgConverter';
 
 // Metadata for SEO (Server-side)
 export const metadata: Metadata = {

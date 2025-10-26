@@ -1,10 +1,13 @@
 'use client';
 
 import { useState, useCallback } from 'react';
-import { convertPNGtoWebP, formatFileSize, downloadBlob, calculateCompression, ConversionResult } from '@/lib/converter/pngToWebpConverter';
-import { validateFiles, FileValidationError, MAX_FILES } from '@/lib/converter/pngToWebpValidator';
+import { convertPNGtoICO, formatFileSize, downloadBlob, ConversionResult } from '@/lib/converter/png/pngToIcoConverter';
+import { validateFiles, FileValidationError, MAX_FILES, VALID_ICO_SIZES } from '@/lib/converter/png/pngToIcoValidator';
 import { Card, CardContent } from '@/components/ui/card';
-import { UploadArea, FileCard, SummaryCard, QualitySettings, ErrorMessage, BatchActions } from './shared';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { UploadArea, FileCard, SummaryCard, ErrorMessage, BatchActions } from '@/components/converter/shared';
+import { Info } from 'lucide-react';
 
 interface FileWithResult {
   file: File;
@@ -14,11 +17,11 @@ interface FileWithResult {
   error: string | null;
 }
 
-export default function PngToWebpConverter() {
+export default function PngToIcoConverter() {
   const [files, setFiles] = useState<FileWithResult[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
-  const [quality, setQuality] = useState(90);
+  const [icoSize, setIcoSize] = useState<number>(32);
 
   const handleFilesSelect = useCallback((selectedFiles: File[]) => {
     try {
@@ -62,7 +65,7 @@ export default function PngToWebpConverter() {
     if (!fileData || fileData.isConverting) return;
     setFiles((prev) => prev.map((f, i) => (i === index ? { ...f, isConverting: true, error: null } : f)));
     try {
-      const result = await convertPNGtoWebP(fileData.file, quality / 100);
+      const result = await convertPNGtoICO(fileData.file, icoSize);
       setFiles((prev) => prev.map((f, i) => (i === index ? { ...f, convertedResult: result, isConverting: false } : f)));
     } catch (err) {
       setFiles((prev) => prev.map((f, i) => i === index ? { ...f, error: err instanceof Error ? err.message : 'Conversion failed', isConverting: false } : f));
@@ -79,7 +82,7 @@ export default function PngToWebpConverter() {
     const fileData = files[index];
     if (!fileData.convertedResult) return;
     const originalName = fileData.file.name.replace(/\.png$/i, '');
-    downloadBlob(fileData.convertedResult.blob, `${originalName}.webp`);
+    downloadBlob(fileData.convertedResult.blob, `${originalName}.ico`);
   };
 
   const downloadAllFiles = () => {
@@ -109,9 +112,6 @@ export default function PngToWebpConverter() {
   const convertedCount = files.filter((f) => f.convertedResult).length;
   const hasConvertedFiles = convertedCount > 0;
   const allConverted = files.length > 0 && convertedCount === files.length;
-  const totalOriginalSize = files.reduce((sum, f) => sum + f.file.size, 0);
-  const totalConvertedSize = files.reduce((sum, f) => sum + (f.convertedResult?.size || 0), 0);
-  const totalCompression = totalOriginalSize > 0 ? calculateCompression(totalOriginalSize, totalConvertedSize) : 0;
 
   return (
     <Card className="w-full">
@@ -138,42 +138,54 @@ export default function PngToWebpConverter() {
                 filesCount={files.length}
                 maxFiles={MAX_FILES}
                 convertedCount={convertedCount}
-                totalCompression={totalCompression}
-                showTransparencyNote
                 onClearAll={handleReset}
               />
-              <QualitySettings
-                quality={quality}
-                onQualityChange={setQuality}
-                minQuality={70}
-                maxQuality={100}
-                note="Preserves transparency"
-                showTransparencyIcon
-              />
+              
+              {/* ICO Size Settings */}
+              <Card>
+                <CardContent className="p-4 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="ico-size" className="text-sm font-semibold">
+                      ICO Size
+                    </Label>
+                    <span className="text-sm font-medium text-primary">{icoSize}x{icoSize}px</span>
+                  </div>
+                  <Select value={icoSize.toString()} onValueChange={(v: string) => setIcoSize(Number(v))}>
+                    <SelectTrigger id="ico-size">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {VALID_ICO_SIZES.map((size) => (
+                        <SelectItem key={size} value={size.toString()}>
+                          {size}x{size}px {size === 16 && '(Browser Tab)'} {size === 32 && '(Recommended)'} {size === 256 && '(High-res)'}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <div className="flex items-start gap-2 text-xs text-muted-foreground">
+                    <Info className="h-3 w-3 mt-0.5 flex-shrink-0" />
+                    <p>32x32px is the standard favicon size. Preserves transparency.</p>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {files.map((fileData, index) => {
-                const compression = fileData.convertedResult
-                  ? calculateCompression(fileData.file.size, fileData.convertedResult.size)
-                  : 0;
-                return (
-                  <FileCard
-                    key={index}
-                    fileName={fileData.file.name}
-                    fileSize={formatFileSize(fileData.file.size)}
-                    previewUrl={fileData.previewUrl}
-                    isConverting={fileData.isConverting}
-                    isConverted={!!fileData.convertedResult}
-                    error={fileData.error}
-                    convertedSize={fileData.convertedResult ? formatFileSize(fileData.convertedResult.size) : undefined}
-                    compressionPercent={compression}
-                    onRemove={() => removeFile(index)}
-                    onConvert={() => convertSingleFile(index)}
-                    onDownload={() => downloadSingleFile(index)}
-                  />
-                );
-              })}
+              {files.map((fileData, index) => (
+                <FileCard
+                  key={index}
+                  fileName={fileData.file.name}
+                  fileSize={formatFileSize(fileData.file.size)}
+                  previewUrl={fileData.previewUrl}
+                  isConverting={fileData.isConverting}
+                  isConverted={!!fileData.convertedResult}
+                  error={fileData.error}
+                  convertedSize={fileData.convertedResult ? formatFileSize(fileData.convertedResult.size) : undefined}
+                  onRemove={() => removeFile(index)}
+                  onConvert={() => convertSingleFile(index)}
+                  onDownload={() => downloadSingleFile(index)}
+                />
+              ))}
             </div>
 
             <BatchActions

@@ -1,10 +1,13 @@
 'use client';
 
 import { useState, useCallback } from 'react';
-import { convertJPGtoPNG, formatFileSize, downloadBlob, ConversionResult } from '@/lib/converter/imageConverter';
-import { validateFiles, FileValidationError, MAX_FILES } from '@/lib/converter/fileValidator';
+import { convertSVGtoPNG, formatFileSize, downloadBlob, ConversionResult } from '@/lib/converter/svg/svgToPngConverter';
+import { validateFiles, FileValidationError, MAX_FILES, VALID_SCALES } from '@/lib/converter/svg/svgToPngValidator';
 import { Card, CardContent } from '@/components/ui/card';
-import { UploadArea, FileCard, SummaryCard, ErrorMessage, BatchActions } from './shared';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { UploadArea, FileCard, SummaryCard, ErrorMessage, BatchActions } from '@/components/converter/shared';
+import { Info } from 'lucide-react';
 
 interface FileWithResult {
   file: File;
@@ -14,16 +17,16 @@ interface FileWithResult {
   error: string | null;
 }
 
-export default function MultiFileConverterClient() {
+export default function SvgToPngConverter() {
   const [files, setFiles] = useState<FileWithResult[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [scale, setScale] = useState<number>(1);
 
   const handleFilesSelect = useCallback((selectedFiles: File[]) => {
     try {
       validateFiles(selectedFiles);
       setError(null);
-
       const newFiles: FileWithResult[] = selectedFiles.map((file) => ({
         file,
         previewUrl: URL.createObjectURL(file),
@@ -31,7 +34,6 @@ export default function MultiFileConverterClient() {
         isConverting: false,
         error: null,
       }));
-
       setFiles((prev) => {
         prev.forEach((f) => {
           URL.revokeObjectURL(f.previewUrl);
@@ -40,7 +42,11 @@ export default function MultiFileConverterClient() {
         return newFiles;
       });
     } catch (err) {
-      setError(err instanceof FileValidationError ? err.message : 'An unexpected error occurred');
+      if (err instanceof FileValidationError) {
+        setError(err.message);
+      } else {
+        setError('An unexpected error occurred');
+      }
     }
   }, []);
 
@@ -49,16 +55,8 @@ export default function MultiFileConverterClient() {
     if (selectedFiles.length > 0) handleFilesSelect(selectedFiles);
   };
 
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(true);
-  };
-
-  const handleDragLeave = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(false);
-  };
-
+  const handleDragOver = (e: React.DragEvent) => { e.preventDefault(); setIsDragging(true); };
+  const handleDragLeave = (e: React.DragEvent) => { e.preventDefault(); setIsDragging(false); };
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
@@ -69,47 +67,32 @@ export default function MultiFileConverterClient() {
   const convertSingleFile = async (index: number) => {
     const fileData = files[index];
     if (!fileData || fileData.isConverting) return;
-
-    setFiles((prev) =>
-      prev.map((f, i) => (i === index ? { ...f, isConverting: true, error: null } : f))
-    );
-
+    setFiles((prev) => prev.map((f, i) => (i === index ? { ...f, isConverting: true, error: null } : f)));
     try {
-      const result = await convertJPGtoPNG(fileData.file);
-      setFiles((prev) =>
-        prev.map((f, i) => (i === index ? { ...f, convertedResult: result, isConverting: false } : f))
-      );
+      const result = await convertSVGtoPNG(fileData.file, { scale });
+      setFiles((prev) => prev.map((f, i) => (i === index ? { ...f, convertedResult: result, isConverting: false } : f)));
     } catch (err) {
-      setFiles((prev) =>
-        prev.map((f, i) =>
-          i === index
-            ? { ...f, error: err instanceof Error ? err.message : 'Conversion failed', isConverting: false }
-            : f
-        )
-      );
+      const errorMessage = err instanceof Error ? err.message : 'Conversion failed';
+      setFiles((prev) => prev.map((f, i) => i === index ? { ...f, error: errorMessage, isConverting: false } : f));
     }
   };
 
   const convertAllFiles = async () => {
     for (let i = 0; i < files.length; i++) {
-      if (!files[i].convertedResult && !files[i].error) {
-        await convertSingleFile(i);
-      }
+      if (!files[i].convertedResult && !files[i].error) await convertSingleFile(i);
     }
   };
 
   const downloadSingleFile = (index: number) => {
     const fileData = files[index];
     if (!fileData.convertedResult) return;
-    const originalName = fileData.file.name.replace(/\.(jpg|jpeg)$/i, '');
+    const originalName = fileData.file.name.replace(/\.svg$/i, '');
     downloadBlob(fileData.convertedResult.blob, `${originalName}.png`);
   };
 
   const downloadAllFiles = () => {
     files.forEach((fileData, index) => {
-      if (fileData.convertedResult) {
-        setTimeout(() => downloadSingleFile(index), index * 100);
-      }
+      if (fileData.convertedResult) setTimeout(() => downloadSingleFile(index), index * 100);
     });
   };
 
@@ -145,9 +128,9 @@ export default function MultiFileConverterClient() {
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
             onFileChange={handleFileChange}
-            acceptedFormats="image/jpeg,image/jpg"
+            acceptedFormats="image/svg+xml"
             maxFiles={MAX_FILES}
-            title="Drag & drop your JPG files here"
+            title="Drag & drop your SVG files here"
           />
         )}
 
@@ -155,12 +138,42 @@ export default function MultiFileConverterClient() {
 
         {files.length > 0 && (
           <div className="space-y-6">
-            <SummaryCard
-              filesCount={files.length}
-              maxFiles={MAX_FILES}
-              convertedCount={convertedCount}
-              onClearAll={handleReset}
-            />
+            <div className="grid md:grid-cols-2 gap-4">
+              <SummaryCard
+                filesCount={files.length}
+                maxFiles={MAX_FILES}
+                convertedCount={convertedCount}
+                onClearAll={handleReset}
+              />
+              
+              {/* Scale Settings */}
+              <Card>
+                <CardContent className="p-4 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="scale" className="text-sm font-semibold">
+                      Output Scale
+                    </Label>
+                    <span className="text-sm font-medium text-primary">{scale}x</span>
+                  </div>
+                  <Select value={scale.toString()} onValueChange={(v: string) => setScale(Number(v))}>
+                    <SelectTrigger id="scale">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {VALID_SCALES.map((s) => (
+                        <SelectItem key={s} value={s.toString()}>
+                          {s}x {s === 1 && '(Original)'} {s === 2 && '(Retina)'} {s === 4 && '(High-res)'}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <div className="flex items-start gap-2 text-xs text-muted-foreground">
+                    <Info className="h-3 w-3 mt-0.5 flex-shrink-0" />
+                    <p>Higher scale = larger PNG with more detail. 2x is recommended for retina displays.</p>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
               {files.map((fileData, index) => (

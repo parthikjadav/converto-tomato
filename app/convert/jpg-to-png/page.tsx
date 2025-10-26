@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import { Metadata } from "next";
-import MultiFileConverterClient from "@/components/converter/MultiFileConverterClient";
+import JpgToPngConverter from '@/components/converter/jpg/JpgToPngConverter';
 import ConverterFeatures from "@/components/converter/ConverterFeatures";
 import ConverterSkeleton from "@/components/converter/ConverterSkeleton";
 
@@ -40,7 +40,7 @@ export default function JPGtoPNGConverter() {
 
         {/* Main Converter - Client Component with Suspense */}
         <Suspense fallback={<ConverterSkeleton />}>
-          <MultiFileConverterClient />
+          <JpgToPngConverter />
         </Suspense>
 
         {/* Features - Server-rendered */}

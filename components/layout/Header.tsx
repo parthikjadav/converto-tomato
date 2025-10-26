@@ -22,6 +22,38 @@ import { Menu, ImageIcon, FileImage, Image } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const converterGroups = {
+  svg: [
+    {
+      title: "SVG to PNG",
+      href: "/convert/svg-to-png",
+      description: "Rasterize vector graphics to PNG",
+      icon: FileImage,
+    },
+    {
+      title: "SVG to JPG",
+      href: "/convert/svg-to-jpg",
+      description: "Rasterize vector graphics to JPG",
+      icon: ImageIcon,
+    },
+    {
+      title: "SVG to WebP",
+      href: "/convert/svg-to-webp",
+      description: "Rasterize to modern WebP format",
+      icon: Image,
+    },
+    {
+      title: "SVG to AVIF",
+      href: "/convert/svg-to-avif",
+      description: "Rasterize to next-gen AVIF format",
+      icon: Image,
+    },
+    {
+      title: "SVG to ICO",
+      href: "/convert/svg-to-ico",
+      description: "Create favicons from vector graphics",
+      icon: ImageIcon,
+    },
+  ],
   jpg: [
     {
       title: "JPG to PNG",
@@ -34,6 +66,24 @@ const converterGroups = {
       href: "/convert/jpg-to-webp",
       description: "Convert JPG to modern WebP format",
       icon: Image,
+    },
+    {
+      title: "JPG to AVIF",
+      href: "/convert/jpg-to-avif",
+      description: "Next-gen format with superior compression",
+      icon: Image,
+    },
+    {
+      title: "JPG to SVG",
+      href: "/convert/jpg-to-svg",
+      description: "Create scalable vector graphics",
+      icon: FileImage,
+    },
+    {
+      title: "JPG to ICO",
+      href: "/convert/jpg-to-ico",
+      description: "Create favicons and icons from JPG",
+      icon: ImageIcon,
     },
   ],
   png: [
@@ -49,6 +99,24 @@ const converterGroups = {
       description: "Convert PNG to WebP with transparency",
       icon: Image,
     },
+    {
+      title: "PNG to AVIF",
+      href: "/convert/png-to-avif",
+      description: "Next-gen format with transparency",
+      icon: Image,
+    },
+    {
+      title: "PNG to SVG",
+      href: "/convert/png-to-svg",
+      description: "Create scalable vector graphics",
+      icon: FileImage,
+    },
+    {
+      title: "PNG to ICO",
+      href: "/convert/png-to-ico",
+      description: "Create favicons with transparency",
+      icon: ImageIcon,
+    },
   ],
   webp: [
     {
@@ -63,10 +131,29 @@ const converterGroups = {
       description: "Convert WebP to JPG for universal support",
       icon: ImageIcon,
     },
+    {
+      title: "WebP to AVIF",
+      href: "/convert/webp-to-avif",
+      description: "Modern to next-gen format",
+      icon: Image,
+    },
+    {
+      title: "WebP to SVG",
+      href: "/convert/webp-to-svg",
+      description: "Create scalable vector graphics",
+      icon: FileImage,
+    },
+    {
+      title: "WebP to ICO",
+      href: "/convert/webp-to-ico",
+      description: "Create favicons from WebP images",
+      icon: ImageIcon,
+    },
   ],
 };
 
 const allConverters = [
+  ...converterGroups.svg,
   ...converterGroups.jpg,
   ...converterGroups.png,
   ...converterGroups.webp,
@@ -77,7 +164,7 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container">
+      <div className="container max-w-6xl">
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-2 group">
@@ -95,101 +182,99 @@ export default function Header() {
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-6">
             <NavigationMenu>
-              <NavigationMenuList>
+              <NavigationMenuList className="space-x-1">
+                {/* SVG Menu */}
                 <NavigationMenuItem>
-                  <NavigationMenuTrigger>Converters</NavigationMenuTrigger>
+                  <NavigationMenuTrigger className="text-sm">SVG</NavigationMenuTrigger>
                   <NavigationMenuContent>
-                    <div className="w-[600px] p-4">
-                      <div className="grid grid-cols-3 gap-4">
-                        {/* JPG Converters */}
-                        <div>
-                          <h4 className="mb-3 text-sm font-semibold text-primary">From JPG</h4>
-                          <ul className="space-y-2">
-                            {converterGroups.jpg.map((converter) => {
-                              const Icon = converter.icon;
-                              return (
-                                <li key={converter.href}>
-                                  <NavigationMenuLink asChild>
-                                    <Link
-                                      href={converter.href}
-                                      className="block select-none rounded-md p-2 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground"
-                                    >
-                                      <div className="flex items-center gap-2 mb-1">
-                                        <Icon className="h-3 w-3 text-primary" />
-                                        <div className="text-sm font-medium">{converter.title}</div>
-                                      </div>
-                                      <p className="text-xs text-muted-foreground line-clamp-2">
-                                        {converter.description}
-                                      </p>
-                                    </Link>
-                                  </NavigationMenuLink>
-                                </li>
-                              );
-                            })}
-                          </ul>
-                        </div>
+                    <ul className="w-[200px] p-2">
+                      {converterGroups.svg.map((converter) => (
+                        <li key={converter.href}>
+                          <NavigationMenuLink asChild>
+                            <Link
+                              href={converter.href}
+                              className="block select-none rounded-md px-3 py-2 text-sm leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground"
+                            >
+                              {converter.title}
+                            </Link>
+                          </NavigationMenuLink>
+                        </li>
+                      ))}
+                    </ul>
+                  </NavigationMenuContent>
+                </NavigationMenuItem>
 
-                        {/* PNG Converters */}
-                        <div>
-                          <h4 className="mb-3 text-sm font-semibold text-primary">From PNG</h4>
-                          <ul className="space-y-2">
-                            {converterGroups.png.map((converter) => {
-                              const Icon = converter.icon;
-                              return (
-                                <li key={converter.href}>
-                                  <NavigationMenuLink asChild>
-                                    <Link
-                                      href={converter.href}
-                                      className="block select-none rounded-md p-2 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground"
-                                    >
-                                      <div className="flex items-center gap-2 mb-1">
-                                        <Icon className="h-3 w-3 text-primary" />
-                                        <div className="text-sm font-medium">{converter.title}</div>
-                                      </div>
-                                      <p className="text-xs text-muted-foreground line-clamp-2">
-                                        {converter.description}
-                                      </p>
-                                    </Link>
-                                  </NavigationMenuLink>
-                                </li>
-                              );
-                            })}
-                          </ul>
-                        </div>
+                {/* JPG Menu */}
+                <NavigationMenuItem>
+                  <NavigationMenuTrigger className="text-sm">JPG</NavigationMenuTrigger>
+                  <NavigationMenuContent>
+                    <ul className="w-[200px] p-2">
+                      {converterGroups.jpg.map((converter) => (
+                        <li key={converter.href}>
+                          <NavigationMenuLink asChild>
+                            <Link
+                              href={converter.href}
+                              className="block select-none rounded-md px-3 py-2 text-sm leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground"
+                            >
+                              {converter.title}
+                            </Link>
+                          </NavigationMenuLink>
+                        </li>
+                      ))}
+                    </ul>
+                  </NavigationMenuContent>
+                </NavigationMenuItem>
 
-                        {/* WebP Converters */}
-                        <div>
-                          <h4 className="mb-3 text-sm font-semibold text-primary">From WebP</h4>
-                          <ul className="space-y-2">
-                            {converterGroups.webp.map((converter) => {
-                              const Icon = converter.icon;
-                              return (
-                                <li key={converter.href}>
-                                  <NavigationMenuLink asChild>
-                                    <Link
-                                      href={converter.href}
-                                      className="block select-none rounded-md p-2 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground"
-                                    >
-                                      <div className="flex items-center gap-2 mb-1">
-                                        <Icon className="h-3 w-3 text-primary" />
-                                        <div className="text-sm font-medium">{converter.title}</div>
-                                      </div>
-                                      <p className="text-xs text-muted-foreground line-clamp-2">
-                                        {converter.description}
-                                      </p>
-                                    </Link>
-                                  </NavigationMenuLink>
-                                </li>
-                              );
-                            })}
-                          </ul>
-                        </div>
-                      </div>
-                    </div>
+                {/* PNG Menu */}
+                <NavigationMenuItem>
+                  <NavigationMenuTrigger className="text-sm">PNG</NavigationMenuTrigger>
+                  <NavigationMenuContent>
+                    <ul className="w-[200px] p-2">
+                      {converterGroups.png.map((converter) => (
+                        <li key={converter.href}>
+                          <NavigationMenuLink asChild>
+                            <Link
+                              href={converter.href}
+                              className="block select-none rounded-md px-3 py-2 text-sm leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground"
+                            >
+                              {converter.title}
+                            </Link>
+                          </NavigationMenuLink>
+                        </li>
+                      ))}
+                    </ul>
+                  </NavigationMenuContent>
+                </NavigationMenuItem>
+
+                {/* WebP Menu */}
+                <NavigationMenuItem>
+                  <NavigationMenuTrigger className="text-sm">WebP</NavigationMenuTrigger>
+                  <NavigationMenuContent>
+                    <ul className="w-[200px] p-2">
+                      {converterGroups.webp.map((converter) => (
+                        <li key={converter.href}>
+                          <NavigationMenuLink asChild>
+                            <Link
+                              href={converter.href}
+                              className="block select-none rounded-md px-3 py-2 text-sm leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground"
+                            >
+                              {converter.title}
+                            </Link>
+                          </NavigationMenuLink>
+                        </li>
+                      ))}
+                    </ul>
                   </NavigationMenuContent>
                 </NavigationMenuItem>
               </NavigationMenuList>
             </NavigationMenu>
+
+            <Link
+              href="/compress"
+              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Compress
+            </Link>
 
             <Link
               href="/about"
@@ -322,6 +407,13 @@ export default function Header() {
 
                   {/* Other Links */}
                   <div className="space-y-2">
+                    <Link
+                      href="/compress"
+                      onClick={() => setIsOpen(false)}
+                      className="block px-3 py-2 text-sm font-medium hover:bg-accent rounded-md transition-colors"
+                    >
+                      Compress Images
+                    </Link>
                     <Link
                       href="/about"
                       onClick={() => setIsOpen(false)}
